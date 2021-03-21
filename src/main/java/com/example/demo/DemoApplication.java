@@ -18,6 +18,6 @@ public class DemoApplication {
 class HelloWorldController {
 	@GetMapping("/")
 	public String hello() {
-		return "hello world!";
+		return "Hello, World!";
 	}
 }
