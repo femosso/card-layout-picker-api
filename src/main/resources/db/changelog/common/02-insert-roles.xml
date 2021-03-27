@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="common:02-insert-roles" author="femosso">
+        <sql>
+            INSERT INTO
+                role (id, name)
+            VALUES
+                (X'958aab358f0811eb8fcc0242ac110002', "ROLE_ADMIN"),
+                (X'9ae1dcde8f0811eb8fcc0242ac110002', "ROLE_CLIENT")
+        </sql>
+    </changeSet>
+</databaseChangeLog>
