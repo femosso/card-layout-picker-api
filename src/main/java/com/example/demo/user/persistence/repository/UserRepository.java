@@ -1,6 +1,5 @@
 package com.example.demo.user.persistence.repository;
 
-import com.example.demo.user.persistence.entity.Role;
 import com.example.demo.user.persistence.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,8 +13,6 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
-
-    Boolean existsByEmail(String email);
 
     List<User> findByRoleId(UUID roleId);
 

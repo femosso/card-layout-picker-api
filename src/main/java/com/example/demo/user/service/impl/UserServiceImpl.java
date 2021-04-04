@@ -1,15 +1,14 @@
 package com.example.demo.user.service.impl;
 
-import com.example.demo.user.domain.RoleType;
-import com.example.demo.user.persistence.helper.RoleLookupHelper;
-import com.example.demo.user.persistence.repository.RoleRepository;
 import com.example.demo.user.persistence.entity.User;
+import com.example.demo.user.persistence.helper.RoleLookupHelper;
 import com.example.demo.user.persistence.repository.UserRepository;
 import com.example.demo.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +24,8 @@ public class UserServiceImpl implements UserService {
     public User save(User user) {
         UUID userId = user.getId();
         if (userId == null) {
-            // TODO - add creation time
+            user.setCreatedAt(Instant.now());
+            user.setUpdatedAt(user.getCreatedAt());
             return userRepository.save(user);
         }
         User entity = userRepository.findById(userId).orElse(null);
@@ -58,7 +58,6 @@ public class UserServiceImpl implements UserService {
         to.setFirstName(from.getFirstName());
         to.setLastName(from.getLastName());
         to.setEmail(from.getEmail());
-
-        // TODO - set updated time
+        to.setUpdatedAt(Instant.now());
     }
 }

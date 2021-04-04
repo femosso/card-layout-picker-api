@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="common:04-create-card-related-tables" author="femosso">
+        <createTable tableName="card">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="file" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="card_field">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="card" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="card_field_type">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="card"
+                                 baseColumnNames="file"
+                                 constraintName="card__file_fk"
+                                 referencedTableName="file"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="card"
+                                 baseColumnNames="created_by"
+                                 constraintName="card__user_fk"
+                                 referencedTableName="user"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="card_field"
+                                 baseColumnNames="card"
+                                 constraintName="card_field__card_fk"
+                                 referencedTableName="card"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="card_field"
+                                 baseColumnNames="type"
+                                 constraintName="card_field__type_fk"
+                                 referencedTableName="card_field_type"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

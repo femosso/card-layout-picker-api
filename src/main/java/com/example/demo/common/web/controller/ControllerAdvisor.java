@@ -23,6 +23,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<MessageResponse> handleAllExceptions(Exception ex, WebRequest request) {
+        ex.printStackTrace();
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
         return new ResponseEntity<>(

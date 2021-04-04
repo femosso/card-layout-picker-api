@@ -1,5 +1,6 @@
 package com.example.demo.user.web.payload.converter;
 
+import com.example.demo.user.domain.RoleType;
 import com.example.demo.user.persistence.entity.Role;
 import com.example.demo.user.persistence.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public class RoleDtoConverter {
             return null;
         }
 
-        return roleRepository.findByName(dto).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        return roleRepository.findByName(RoleType.valueOf(dto)).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
     }
 
     public String toDto(Role role) {

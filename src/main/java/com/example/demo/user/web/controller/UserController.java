@@ -78,6 +78,6 @@ public class UserController {
         if (!user.isPresent()) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(new MessageResponse("Client registered successfully!", null, 3));
+        return ResponseEntity.ok(new MessageResponse("Client deleted successfully!", null, 3));
     }
 }

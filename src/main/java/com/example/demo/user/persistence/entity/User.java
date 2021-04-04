@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Getter
@@ -20,6 +21,12 @@ public class User extends AbstractEntity {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private Instant createdAt;
+
+    @Column(nullable = false)
+    private Instant updatedAt;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "role")

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="common:05-insert-card-field-types" author="femosso">
+        <sql>
+            INSERT INTO
+                card_field_type (id, type)
+            VALUES
+                (X'57f7b92a902611eb8fcc0242ac110002', "TEXT"),
+                (X'6a4a1380902611eb8fcc0242ac110002', "NUMBER"),
+                (X'631c82ab902611eb8fcc0242ac110002', "DATE")
+        </sql>
+    </changeSet>
+</databaseChangeLog>
