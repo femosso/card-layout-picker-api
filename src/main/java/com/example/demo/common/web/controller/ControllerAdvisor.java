@@ -19,7 +19,7 @@ import java.util.List;
 @ControllerAdvice
 public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<MessageResponse> handleAllExceptions(Exception ex, WebRequest request) {

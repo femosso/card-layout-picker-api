@@ -1,5 +1,6 @@
 package com.example.demo.user.service;
 
+import com.example.demo.user.persistence.entity.PasswordResetToken;
 import com.example.demo.user.persistence.entity.User;
 
 import java.util.List;
@@ -12,8 +13,16 @@ public interface UserService {
 
     Optional<User> get(UUID id);
 
+    Optional<User> getByEmail(String email);
+
     List<User> list();
 
     Optional<User> delete(UUID id);
+
+    PasswordResetToken createPasswordResetToken(UUID userId);
+
+    boolean isPasswordResetTokenValid(UUID tokenId);
+
+    boolean changePasswordByToken(UUID tokenId, String password);
 
 }

@@ -37,10 +37,28 @@
             </column>
         </createTable>
 
+        <createTable tableName="password_reset_token">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="user" type="BINARY(16)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="expire_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <addForeignKeyConstraint baseTableName="user"
                                  baseColumnNames="role"
                                  constraintName="user__role_fk"
                                  referencedTableName="role"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="password_reset_token"
+                                 baseColumnNames="user"
+                                 constraintName="password_reset_token__user_fk"
+                                 referencedTableName="user"
                                  referencedColumnNames="id"/>
     </changeSet>
 </databaseChangeLog>

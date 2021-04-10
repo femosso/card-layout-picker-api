@@ -1,14 +1,22 @@
 package com.example.demo.user.service.impl;
 
+import com.example.demo.user.persistence.entity.PasswordResetToken;
 import com.example.demo.user.persistence.entity.User;
 import com.example.demo.user.persistence.helper.RoleLookupHelper;
+import com.example.demo.user.persistence.repository.PasswordResetTokenRepository;
 import com.example.demo.user.persistence.repository.UserRepository;
 import com.example.demo.user.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,8 +24,17 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+    @Autowired
+    private PasswordEncoder encoder;
+
+    @Value("${demo.password.resetTokenExpire}")
+    private Long resetTokenExpire;
 
     @Override
     @Transactional
@@ -42,6 +59,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<User> getByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<User> list() {
         return userRepository.findByRoleId(RoleLookupHelper.ROLE_CLIENT);
     }
@@ -52,6 +75,47 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = get(id);
         userRepository.deleteById(id);
         return user;
+    }
+
+    @Override
+    @Transactional
+    public PasswordResetToken createPasswordResetToken(UUID userId) {
+        Optional<User> user = get(userId);
+        if (!user.isPresent()) return null;
+
+        PasswordResetToken token = new PasswordResetToken();
+        token.setExpireAt(Instant.now().plus(resetTokenExpire, ChronoUnit.HOURS));
+        token.setUser(user.get());
+        return passwordResetTokenRepository.save(token);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isPasswordResetTokenValid(UUID tokenId) {
+        return passwordResetTokenRepository.findById(tokenId)
+                .filter(token -> Instant.now().isBefore(token.getExpireAt()))
+                .isPresent();
+    }
+
+    @Override
+    @Transactional
+    public boolean changePasswordByToken(UUID tokenId, String password) {
+        Optional<PasswordResetToken> token = passwordResetTokenRepository.findById(tokenId);
+        if (token.isPresent() && Instant.now().isBefore(token.get().getExpireAt())) {
+            User user = token.get().getUser();
+            user.setPassword(encoder.encode(password));
+            passwordResetTokenRepository.delete(token.get());
+            return true;
+        }
+        return false;
+    }
+
+    @Scheduled(fixedDelay = 1000 * 60 * 60 * 24) // once a day
+    @Transactional
+    public void performDbClearance() {
+        Instant now = Instant.now();
+        int tokensRemoved = passwordResetTokenRepository.deleteByExpireAtLessThanEqual(now);
+        logger.debug("{} expired password reset token(s) removed.", tokensRemoved);
     }
 
     private void updateFields(User from, User to) {

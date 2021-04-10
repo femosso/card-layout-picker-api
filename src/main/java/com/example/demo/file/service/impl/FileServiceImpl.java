@@ -35,7 +35,7 @@ public class FileServiceImpl implements FileService {
     private ServerProperties serverProperties;
 
     @Value("${app.upload.dir:${user.dir}/images}")
-    public String uploadDir;
+    private String uploadDir;
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Map<String, String> fileExtensionMap = new HashMap<>();
