@@ -3,13 +3,12 @@ package com.example.demo.card.web.payload;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
-public class CardOutDto {
-    private UUID id;
-    private String imagePath;
+public class CardOutDto extends MinimalCardOutDto {
     private List<CardFieldOutDto> fields;
+    private Instant createdAt;
 }

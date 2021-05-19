@@ -14,7 +14,7 @@ public class CardFieldTypeDtoConverter {
 
         CardFieldTypeOutDto dto = new CardFieldTypeOutDto();
         dto.setId(entity.getId());
-        dto.setType(entity.getType().name());
+        dto.setName(entity.getType().name());
         return dto;
     }
 }

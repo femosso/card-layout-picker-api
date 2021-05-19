@@ -9,17 +9,21 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 public class PasswordResetToken extends AbstractEntity {
 
-    @Column(nullable = false)
-    private Instant expireAt;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "user")
     private User user;
+
+    @Column(nullable = false)
+    private UUID token;
+
+    @Column(nullable = false)
+    private Instant expireAt;
 
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="common:06-create-order-related-tables" author="femosso">
+        <createTable tableName="order">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="person_id" type="VARCHAR(128)"/>
+            <column name="employee_id" type="VARCHAR(128)"/>
+            <column name="card" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="order_answer">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="order" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="card_field" type="BINARY(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="answer" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="order_status">
+            <column name="id" type="BINARY(16)">
+                <constraints nullable="false" unique="true" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="order"
+                                 baseColumnNames="card"
+                                 constraintName="order__card_fk"
+                                 referencedTableName="card"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order"
+                                 baseColumnNames="status"
+                                 constraintName="order__order_status_fk"
+                                 referencedTableName="order_status"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order"
+                                 baseColumnNames="created_by"
+                                 constraintName="order__user_fk"
+                                 referencedTableName="user"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order_answer"
+                                 baseColumnNames="order"
+                                 constraintName="order_answer__order_fk"
+                                 referencedTableName="order"
+                                 referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint baseTableName="order_answer"
+                                 baseColumnNames="card_field"
+                                 constraintName="order_answer__card_field_fk"
+                                 referencedTableName="card_field"
+                                 referencedColumnNames="id"/>
+
+    </changeSet>
+</databaseChangeLog>

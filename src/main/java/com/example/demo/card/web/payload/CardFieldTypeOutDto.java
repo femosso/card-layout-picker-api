@@ -9,5 +9,5 @@ import java.util.UUID;
 @Setter
 public class CardFieldTypeOutDto {
     private UUID id;
-    private String type;
+    private String name;
 }

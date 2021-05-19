@@ -3,11 +3,9 @@ package com.example.demo.common.service.impl;
 import com.example.demo.common.service.MessageService;
 import com.example.demo.common.web.payload.Mail;
 import com.example.demo.user.persistence.entity.PasswordResetToken;
-import com.example.demo.user.persistence.entity.User;
 import com.example.demo.user.service.UserService;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -40,20 +37,17 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public boolean sendForgotPasswordMessage(String email, String locale) {
-        Optional<User> user = userService.getByEmail(email);
-        if (!user.isPresent()) return false;
-
-        PasswordResetToken token = userService.createPasswordResetToken(user.get().getId());
-        if (token == null) return false;
+        PasswordResetToken pwdReset = userService.createPasswordResetToken(email);
+        if (pwdReset == null) return false;
 
         Map<String, Object> model = new HashMap<>();
-        model.put("firstName", user.get().getFirstName());
-        model.put("lastName", user.get().getLastName());
-        model.put("passwordUpdateUrl", passwordUpdateUrl + token.getId());
+        model.put("firstName", pwdReset.getUser().getFirstName());
+        model.put("lastName", pwdReset.getUser().getLastName());
+        model.put("passwordUpdateUrl", passwordUpdateUrl + pwdReset.getToken());
 
         Mail mail = new Mail();
         mail.setMailFrom("");
-        mail.setMailTo(user.get().getEmail());
+        mail.setMailTo(pwdReset.getUser().getEmail());
         mail.setModel(model);
 
         try {

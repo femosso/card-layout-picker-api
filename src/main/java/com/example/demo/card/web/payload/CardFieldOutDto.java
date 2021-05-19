@@ -8,6 +8,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CardFieldOutDto {
+    private UUID id;
     private String name;
-    private UUID fieldTypeId;
+    private CardFieldTypeOutDto type;
 }

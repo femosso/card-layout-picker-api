@@ -25,7 +25,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private UserDtoConverter userDtoConverter;
 
@@ -34,6 +33,19 @@ public class UserController {
     public ResponseEntity<MessageResponse> create(@Valid @RequestBody RegisterDto registerDto) {
         registerDto.setRole(RoleType.ROLE_CLIENT.name());
         User user = userService.save(userDtoConverter.toEntity(registerDto));
+        if (user == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(new MessageResponse("Client registered successfully!", null, 3));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<MessageResponse> update(@PathVariable("id") UUID id,
+                                                  @Valid @RequestBody RegisterDto registerDto) {
+        User user = userDtoConverter.toEntity(registerDto);
+        user.setId(id);
+        user = userService.save(user);
         if (user == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -56,19 +68,6 @@ public class UserController {
                 .map(userDtoConverter::toDto)
                 .collect(Collectors.toList())
         );
-    }
-
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<MessageResponse> update(@PathVariable("id") UUID id,
-                                                  @Valid @RequestBody RegisterDto registerDto) {
-        User user = userDtoConverter.toEntity(registerDto);
-        user.setId(id);
-        user = userService.save(user);
-        if (user == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(new MessageResponse("Client registered successfully!", null, 3));
     }
 
     @DeleteMapping("/{id}")

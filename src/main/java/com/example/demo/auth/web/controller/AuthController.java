@@ -54,17 +54,26 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordDto forgotPasswordDto) {
-        messageService.sendForgotPasswordMessage(forgotPasswordDto.getEmail(), forgotPasswordDto.getLocale());
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return new ResponseEntity<>("",
+                messageService.sendForgotPasswordMessage(forgotPasswordDto.getEmail(), forgotPasswordDto.getLocale()) ?
+                        HttpStatus.OK :
+                        HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/update-password")
-    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto) {
-        return new ResponseEntity<>("",
-                userService.changePasswordByToken(updatePasswordDto.getToken(), updatePasswordDto.getPassword()) ?
-                        HttpStatus.OK :
-                        HttpStatus.FORBIDDEN
-        );
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody UpdatePasswordDto updatePasswordDto,
+                                                 @RequestParam(name = "validate", defaultValue = "false") boolean validate) {
+        return validate ?
+                new ResponseEntity<>("",
+                        userService.isChangePasswordTokenValid(updatePasswordDto.getToken()) ?
+                                HttpStatus.OK :
+                                HttpStatus.FORBIDDEN
+                ) :
+                new ResponseEntity<>("",
+                        userService.changePasswordByToken(updatePasswordDto.getToken(), updatePasswordDto.getPassword()) ?
+                                HttpStatus.OK :
+                                HttpStatus.FORBIDDEN
+                );
     }
 }
 

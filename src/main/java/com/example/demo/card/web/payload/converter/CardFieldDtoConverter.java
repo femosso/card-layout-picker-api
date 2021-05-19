@@ -1,7 +1,7 @@
 package com.example.demo.card.web.payload.converter;
 
 import com.example.demo.card.persistence.entity.CardField;
-import com.example.demo.card.persistence.repository.CardFieldTypeRepository;
+import com.example.demo.card.persistence.entity.CardFieldType;
 import com.example.demo.card.web.payload.CardFieldInDto;
 import com.example.demo.card.web.payload.CardFieldOutDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class CardFieldDtoConverter {
 
     @Autowired
-    public CardFieldTypeRepository cardFieldTypeRepository;
+    public CardFieldTypeDtoConverter cardFieldTypeDtoConverter;
 
     public CardField toEntity(CardFieldInDto dto) {
         if (dto == null) {
@@ -19,10 +19,13 @@ public class CardFieldDtoConverter {
         }
 
         CardField entity = new CardField();
+        entity.setId(dto.getId());
         entity.setLabel(dto.getName());
-        entity.setType(cardFieldTypeRepository.findById(dto.getFieldTypeId())
-                .orElseThrow(() -> new RuntimeException("Error: Card field type not found."))
-        );
+        if (dto.getFieldTypeId() != null) {
+            CardFieldType cardFieldType = new CardFieldType();
+            cardFieldType.setId(dto.getFieldTypeId());
+            entity.setType(cardFieldType);
+        }
         return entity;
     }
 
@@ -32,8 +35,9 @@ public class CardFieldDtoConverter {
         }
 
         CardFieldOutDto dto = new CardFieldOutDto();
+        dto.setId(entity.getId());
         dto.setName(entity.getLabel());
-        dto.setFieldTypeId(entity.getType().getId());
+        dto.setType(cardFieldTypeDtoConverter.toDto(entity.getType()));
         return dto;
     }
 }

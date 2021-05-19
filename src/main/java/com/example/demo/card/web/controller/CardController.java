@@ -11,7 +11,11 @@ import com.example.demo.card.web.payload.converter.CardDtoConverter;
 import com.example.demo.card.web.payload.converter.CardFieldDtoConverter;
 import com.example.demo.card.web.payload.converter.CardFieldTypeDtoConverter;
 import com.example.demo.common.web.payload.MessageResponse;
+import com.example.demo.common.web.payload.table.TableDataInDto;
+import com.example.demo.common.web.payload.table.TableDataOutDto;
+import com.example.demo.common.web.payload.table.converter.TableDataDtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,21 +36,18 @@ public class CardController {
 
     @Autowired
     private CardService cardService;
-
     @Autowired
     private CardFieldService cardFieldService;
-
     @Autowired
     private CardFieldTypeService cardFieldTypeService;
-
     @Autowired
     private CardDtoConverter cardDtoConverter;
-
     @Autowired
     private CardFieldDtoConverter cardFieldDtoConverter;
-
     @Autowired
     private CardFieldTypeDtoConverter cardFieldTypeDtoConverter;
+    @Autowired
+    private TableDataDtoConverter tableDataDtoConverter;
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_CLIENT')")
@@ -54,6 +55,27 @@ public class CardController {
                                                   @RequestPart("file") @Valid @NotNull @NotBlank MultipartFile file) {
         Card card = cardService.save(
                 cardDtoConverter.toEntity(cardInDto),
+                file,
+                cardInDto.getFields()
+                        .stream()
+                        .map(cardFieldDtoConverter::toEntity)
+                        .collect(Collectors.toList())
+        );
+        if (card == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(new MessageResponse("Card registered successfully!", null, 3));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_CLIENT')")
+    public ResponseEntity<MessageResponse> update(@PathVariable("id") UUID id,
+                                                  @RequestPart("card") @Valid CardInDto cardInDto,
+                                                  @RequestPart("file") @Valid @NotNull @NotBlank MultipartFile file) {
+        Card card = cardDtoConverter.toEntity(cardInDto);
+        card.setId(id);
+        card = cardService.save(
+                card,
                 file,
                 cardInDto.getFields()
                         .stream()
@@ -85,25 +107,18 @@ public class CardController {
         );
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/list")
     @PreAuthorize("hasRole('ROLE_CLIENT')")
-    public ResponseEntity<MessageResponse> update(@PathVariable("id") UUID id,
-                                                  @RequestPart("card") @Valid CardInDto cardInDto,
-                                                  @RequestPart("file") @Valid @NotNull @NotBlank MultipartFile file) {
-        Card card = cardDtoConverter.toEntity(cardInDto);
-        card.setId(id);
-        card = cardService.save(
-                card,
-                file,
-                cardInDto.getFields()
-                        .stream()
-                        .map(cardFieldDtoConverter::toEntity)
-                        .collect(Collectors.toList())
+    public ResponseEntity<TableDataOutDto<CardOutDto>> listTableData(@Valid @RequestBody TableDataInDto input) {
+        Page<Card> pageResult = cardService.list(tableDataDtoConverter.toPagingFilter(input));
+        TableDataOutDto<CardOutDto> result = new TableDataOutDto<>();
+        result.setData(pageResult
+                .stream()
+                .map(card -> cardDtoConverter.toDto(card, cardFieldService.listByCard(card)))
+                .collect(Collectors.toList())
         );
-        if (card == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok(new MessageResponse("Card registered successfully!", null, 3));
+        result.setTotal(pageResult.getTotalElements());
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")

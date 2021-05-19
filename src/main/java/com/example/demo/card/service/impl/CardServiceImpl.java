@@ -8,8 +8,10 @@ import com.example.demo.card.service.CardFieldService;
 import com.example.demo.card.service.CardService;
 import com.example.demo.card.web.payload.converter.CardDtoConverter;
 import com.example.demo.card.web.payload.converter.CardFieldDtoConverter;
+import com.example.demo.common.web.payload.PagingFilter;
 import com.example.demo.file.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,13 +59,18 @@ public class CardServiceImpl implements CardService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Card> get(UUID id) {
-        return cardRepository.findById(id, authService.currentUser());
+        return cardRepository.findByIdAndCreatedBy(id, authService.currentUser());
+    }
+
+    @Override
+    public List<Card> list() {
+        return cardRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Card> list() {
-        return cardRepository.findAllByUser(authService.currentUser());
+    public Page<Card> list(PagingFilter pagingFilter) {
+        return cardRepository.findAllByUser(authService.currentUser(), pagingFilter.getPaging());
     }
 
     @Override

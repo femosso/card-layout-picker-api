@@ -79,28 +79,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public PasswordResetToken createPasswordResetToken(UUID userId) {
-        Optional<User> user = get(userId);
+    public PasswordResetToken createPasswordResetToken(String email) {
+        Optional<User> user = getByEmail(email);
         if (!user.isPresent()) return null;
 
+        int tokensRemoved = passwordResetTokenRepository.deleteByUserId(user.get().getId());
+        logger.debug("{} password reset token(s) removed for the user.", tokensRemoved);
+
         PasswordResetToken token = new PasswordResetToken();
-        token.setExpireAt(Instant.now().plus(resetTokenExpire, ChronoUnit.HOURS));
         token.setUser(user.get());
+        token.setToken(UUID.randomUUID());
+        token.setExpireAt(Instant.now().plus(resetTokenExpire, ChronoUnit.HOURS));
         return passwordResetTokenRepository.save(token);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public boolean isPasswordResetTokenValid(UUID tokenId) {
-        return passwordResetTokenRepository.findById(tokenId)
-                .filter(token -> Instant.now().isBefore(token.getExpireAt()))
-                .isPresent();
+    public boolean isChangePasswordTokenValid(UUID tokenId) {
+        Optional<PasswordResetToken> token = passwordResetTokenRepository.findByToken(tokenId);
+        return token.isPresent() && Instant.now().isBefore(token.get().getExpireAt());
     }
 
     @Override
     @Transactional
     public boolean changePasswordByToken(UUID tokenId, String password) {
-        Optional<PasswordResetToken> token = passwordResetTokenRepository.findById(tokenId);
+        Optional<PasswordResetToken> token = passwordResetTokenRepository.findByToken(tokenId);
         if (token.isPresent() && Instant.now().isBefore(token.get().getExpireAt())) {
             User user = token.get().getUser();
             user.setPassword(encoder.encode(password));

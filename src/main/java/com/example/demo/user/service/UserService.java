@@ -19,9 +19,9 @@ public interface UserService {
 
     Optional<User> delete(UUID id);
 
-    PasswordResetToken createPasswordResetToken(UUID userId);
+    PasswordResetToken createPasswordResetToken(String email);
 
-    boolean isPasswordResetTokenValid(UUID tokenId);
+    boolean isChangePasswordTokenValid(UUID tokenId);
 
     boolean changePasswordByToken(UUID tokenId, String password);
 

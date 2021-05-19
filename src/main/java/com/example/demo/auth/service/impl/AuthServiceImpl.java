@@ -44,7 +44,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User currentUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userService.get(userDetails.getId()).orElseThrow(UnauthorizedException::new);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+            return userService.get(userDetails.getId()).orElseThrow(UnauthorizedException::new);
+        }
+        return null;
     }
 }

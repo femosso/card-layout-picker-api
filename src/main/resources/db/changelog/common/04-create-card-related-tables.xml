@@ -67,7 +67,7 @@
 
         <addForeignKeyConstraint baseTableName="card_field"
                                  baseColumnNames="type"
-                                 constraintName="card_field__type_fk"
+                                 constraintName="card_field__card_field_type_fk"
                                  referencedTableName="card_field_type"
                                  referencedColumnNames="id"/>
     </changeSet>

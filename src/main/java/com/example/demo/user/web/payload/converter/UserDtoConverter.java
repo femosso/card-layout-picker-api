@@ -12,7 +12,6 @@ public class UserDtoConverter {
 
     @Autowired
     private PasswordEncoder encoder;
-
     @Autowired
     private RoleDtoConverter roleDtoConverter;
 

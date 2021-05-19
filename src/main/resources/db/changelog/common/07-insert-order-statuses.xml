@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="common:07-insert-order-statuses" author="femosso">
+        <sql>
+            INSERT INTO
+                order_status (id, name)
+            VALUES
+                (X'36e3b5b19b0d11eb970a0242ac110002', "WAITING_EMPLOYEE"),
+                (X'3b1bb6fd9b0d11eb970a0242ac110002', "VALIDATING_FIELDS"),
+                (X'3f7813a09b0d11eb970a0242ac110002', "CREATED"),
+                (X'41dfc9239b0d11eb970a0242ac110002', "IN_PRODUCTION"),
+                (X'4465d4499b0d11eb970a0242ac110002', "FINISHED")
+        </sql>
+    </changeSet>
+</databaseChangeLog>
